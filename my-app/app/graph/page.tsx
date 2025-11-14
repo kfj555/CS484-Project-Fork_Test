@@ -14,12 +14,13 @@ export default async function Graph({
 `);
 
   const data = await res.json();
-  const error = data.error ? 1 : 0; // TODO: create a full error page/component
+  console.log(data);
+  const error = data.length === 0 ? 1 : 0; // TODO: create a full error page/component
 
   console.log(data);
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
+    <div className="flex flex-col justify-center items-center py-10">
       {error === 0 && <GraphBody data={data} />}
       {error === 1 && (
         <div className="border-1">

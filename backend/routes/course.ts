@@ -52,11 +52,13 @@ courseRouter.get("/exact", (req: Request, res: Response) => {
       WHERE c.dept_name = ? AND c.course_nbr = ? AND s.season = ? AND s.year = ?
       `
     )
-    .get(dept, cn, term.toString().toUpperCase(), year);
+    .all(dept, cn, term.toString().toUpperCase(), year);
 
   if (!course) {
     return res.status(404).json({ error: "Course not found" });
   }
+
+  console.log(course);
 
   res.json(course);
 });

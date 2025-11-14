@@ -5,12 +5,19 @@ import Select from "./_components/Select";
 
 // TODO: make this page type safe
 
+// for readability purposes, maps full term names to abbreviations used in DB queries
+const termMap: { [key: string]: string } = {
+  Fall: "FA",
+  Spring: "SP",
+  Summer: "SU",
+};
+
 export default function HomeBody({ departments = [], years = [], cNums = [] }) {
   // department, term, year, and course num used for querying
   const [department, setDepartment] = useState(departments[0].dept_name ?? "");
   const [year, setYear] = useState(years[0].year ?? 0);
-  const [term, setTerm] = useState("FA");
-  const terms = ["FA", "SP", "SU"];
+  const [term, setTerm] = useState("Fall");
+  const terms = ["Fall", "Spring", "Summer"];
   const [num, setNum] = useState(cNums[0].course_nbr ?? 0);
   const [nums, setNums] = useState<{ course_nbr: number }[]>(cNums);
 
@@ -44,7 +51,9 @@ export default function HomeBody({ departments = [], years = [], cNums = [] }) {
       <Select label="Terms" items={terms} onChange={setTerm} />
       <Select label="Year" items={years} onChange={setYear} />
       <Select label="Course Numbers" items={nums} onChange={setNum} />
-      <Button href={`./graph?d=${department}&t=${term}&y=${year}&n=${num}`}>
+      <Button
+        href={`./graph?d=${department}&t=${termMap[term]}&y=${year}&n=${num}`}
+      >
         Get Graph
       </Button>
     </div>
