@@ -1,0 +1,40 @@
+#easy-course-find-button {
+    align-self: flex-center;
+    border-radius: 4px;
+    padding: 1px 8px;
+    margin-top: 10px;
+
+    color: #F2F7EB;
+    background-color: #D50032;
+}
+
+.courses-table{
+    border: 1px solid black;
+    border-radius: 10px;
+    margin: 10px 0px;
+}
+
+#course-subject-number-header{
+    text-align: left;
+    column-span: all;
+    background-color: #D50032;
+    color: #F2F7EB;
+    padding: 0 0.5rem;
+}
+
+.courses-entries-header-row{
+    text-align: left;
+    background-color: #D50032;
+    color: #F2F7EB;
+    th{
+        padding: 0 0.5rem;
+        border: 1px solid black;
+    }
+}
+
+.courses-entries-row{
+    text-align: center;
+    th{
+        border: 1px solid black;
+    }
+}

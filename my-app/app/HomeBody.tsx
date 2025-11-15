@@ -5,57 +5,87 @@ import Select from "./_components/Select";
 
 // TODO: make this page type safe
 
-// for readability purposes, maps full term names to abbreviations used in DB queries
-const termMap: { [key: string]: string } = {
-  Fall: "FA",
-  Spring: "SP",
-  Summer: "SU",
-};
-
-export default function HomeBody({ departments = [], years = [], cNums = [] }) {
+export default function HomeBody({
+  departments = [{ dept_name: "" }],
+  years = [{ year: -1 }],
+  cNums = [{ course_nbr: "" }],
+}) {
   // department, term, year, and course num used for querying
-  const [department, setDepartment] = useState(departments[0].dept_name ?? "");
-  const [year, setYear] = useState(years[0].year ?? 0);
-  const [term, setTerm] = useState("Fall");
-  const terms = ["Fall", "Spring", "Summer"];
-  const [num, setNum] = useState(cNums[0].course_nbr ?? 0);
-  const [nums, setNums] = useState<{ course_nbr: number }[]>(cNums);
-
-  // useEffect updates list of course numbers every time department changes
+  const [department, setDepartment] = useState<string>(
+    departments[0].dept_name ?? ""
+  );
+  const [year, setYear] = useState<number>(years[0].year ?? 0);
+  const [term, setTerm] = useState<string>("FA");
+  const [availableSeasons, setAvailableSeasons] = useState<string[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<string>(
+    cNums[0].course_nbr ?? ""
+  );
+  const [availableCourseNumbers, setAvailableCourseNumbers] = useState<
+    string[]
+  >(cNums.map((c) => c.course_nbr) ?? []);
+  // When department or year change, fetch available seasons and set a default term
   useEffect(() => {
-    const fetchData = async () => {
+    // When department or year change, fetch available seasons and set a default term
+    const fetchSeasons = async () => {
       if (department === "") return;
 
-      const numRes = await fetch(
-        `http://localhost:3001/course?department=${department}`
+      const availableTermsRes = await fetch(
+        `http://localhost:3001/semesters?department=${department}&year=${year}`
       );
-      const numData = await numRes.json();
-
-      setNums(numData);
-      if (numData.length > 0) {
-        setNum(Number(numData[0].course_nbr));
-      } else {
-        setNum(0);
-      }
+      const availableSeasonsData: string[] = await availableTermsRes.json();
+      setAvailableSeasons(availableSeasonsData);
+      const defaultTerm = availableSeasonsData[0] ?? "FA";
+      setTerm(defaultTerm);
     };
-    fetchData();
-  }, [department]);
+    fetchSeasons();
+  }, [department, year]);
+
+  // When department, year, or term changes, fetch course numbers for the chosen season
+  useEffect(() => {
+    const fetchCourses = async () => {
+      if (department === "") return;
+      const seasonToUse = term ?? availableSeasons[0] ?? "FA";
+
+      const availableCourseNumbersRes = await fetch(
+        `http://localhost:3001/semesters/courses?department=${department}&year=${year}&season=${seasonToUse}`
+      );
+      const availableCourseNumbersData: string[] =
+        await availableCourseNumbersRes.json();
+      setAvailableCourseNumbers(availableCourseNumbersData);
+      setSelectedCourse(availableCourseNumbersData[0] ?? "");
+    };
+    fetchCourses();
+  }, [department, year, term, availableSeasons]);
 
   return (
-    <div className="flex flex-col gap-3 border-1 w-fit p-6 my-10">
-      <Select
-        label="Departments"
-        items={departments}
-        onChange={setDepartment}
-      />
-      <Select label="Terms" items={terms} onChange={setTerm} />
-      <Select label="Year" items={years} onChange={setYear} />
-      <Select label="Course Numbers" items={nums} onChange={setNum} />
-      <Button
-        href={`./graph?d=${department}&t=${termMap[term]}&y=${year}&n=${num}`}
-      >
-        Get Graph
-      </Button>
+    <div>
+      <Button href="./easyCourses">Find Easy Courses</Button>
+      <div className="flex flex-col gap-3 border-1 w-fit p-6 my-10">
+        <Select
+          label="Departments"
+          items={departments}
+          onChange={setDepartment}
+          value={department}
+        />
+        <Select
+          label="Terms"
+          items={availableSeasons}
+          onChange={setTerm}
+          value={term}
+        />
+        <Select label="Year" items={years} onChange={setYear} value={year} />
+        <Select
+          label="Course Numbers"
+          items={availableCourseNumbers}
+          onChange={setSelectedCourse}
+          value={selectedCourse}
+        />
+        <Button
+          href={`./graph?d=${department}&t=${term}&y=${year}&n=${selectedCourse}`}
+        >
+          Get Graph
+        </Button>
+      </div>
     </div>
   );
 }
