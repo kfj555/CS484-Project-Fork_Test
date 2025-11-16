@@ -27,3 +27,11 @@ export type Course = {
   title: string;
   year: number;
 };
+
+export type EasyCourse = {
+    subj_cd: string;
+    course_nbr: string;
+    title: string;
+    instructor: string;
+    avg_gpa: number;
+};

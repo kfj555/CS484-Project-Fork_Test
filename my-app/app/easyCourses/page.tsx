@@ -2,39 +2,46 @@
 import { useEffect, useState } from "react";
 import Select from "../_components/Select";
 import "../styles/easyCourses.css";
-
-type EasyCourse = {
-    subj_cd: string;
-    course_nbr: string;
-    instructor: string;
-    avg_gpa: number;
-};
+import type { EasyCourse } from "../types";
 
 export default function EasyCoursesPage() {
-    const courseLevels: string[] = ["all", "100", "200", "300", "400", "500"];
-    const [departmentArray, setDepartmentArray] = useState<string[]>([]);
+    //departments variables
     const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+    const [departmentArray, setDepartmentArray] = useState<string[]>([]);
+    //years
+    const [yearArray, setYearArray] = useState<string[]>([]);
+    const [selectedYear, setSelectedYear] = useState<string>("");
+    //courses variables
+    const courseLevels: string[] = ["all", "100", "200", "300", "400", "500"];
     const [selectedLevel, setSelectedLevel] = useState<string>("all");
+    //courses data map
     const [easyCoursesMap, setEasyCoursesMap] = useState<Map<string, EasyCourse[]>>(new Map());
 
+    // On component mount, fetch the list of departments
     useEffect(() => {
-        const fetchDepartments = async () => {
-            const res = await fetch("http://localhost:3001/department");
-            const data = await res.json();
-            setDepartmentArray(data.map((dept: { dept_name: string }) => dept.dept_name));
-            setSelectedDepartment(data[1]?.dept_name || "");
-        }
-        fetchDepartments(); 
+        const fetchData = async () => {
+            const departmentRes = await fetch("http://localhost:3001/department");
+            const departmentData = await departmentRes.json();
+            setDepartmentArray(departmentData.map((dept: { dept_name: string }) => dept.dept_name).splice(1));
+            setSelectedDepartment(departmentData[1]?.dept_name || "");
+
+            const yearRes = await fetch("http://localhost:3001/year");
+            const yearData = await yearRes.json();
+            const reversedYearData: string[] = yearData.map((curr_num: {year: number}) => curr_num.year.toString()).reverse();
+            setYearArray(reversedYearData);
+            setSelectedYear(reversedYearData[0] || "");
+        };
+        fetchData();
     }, []);
 
     async function findEasyCourseHandler(): Promise<void> {
         const fetchEasyCourses = async () => {
             const easyCoursesRes = await fetch(
-                `http://localhost:3001/statistics/easy?department=${selectedDepartment}&level=${selectedLevel}`
+                `http://localhost:3001/statistics/easy?department=${selectedDepartment}&level=${selectedLevel}&year=${selectedYear}`
             );
-            const easyCoursesData: EasyCourse[] = await easyCoursesRes.json();
-            const copiedArray: EasyCourse[] = [...easyCoursesData];
-            const newArray: Map<string, EasyCourse[]> = new Map();
+            const easyCoursesData: EasyCourse[] = await easyCoursesRes.json(); 
+            const copiedArray: EasyCourse[] = [...easyCoursesData]; // Create a copy to manipulate
+            const newArray: Map<string, EasyCourse[]> = new Map(); // Map to group courses by "SUBJ_CD COURSE_NBR" Ex: all "CS 101" grouped together
             while (copiedArray.length) {
                 const currentSubjectName = copiedArray.at(0)?.subj_cd;
                 const currentCourseNumber = copiedArray.at(0)?.course_nbr;
@@ -43,8 +50,8 @@ export default function EasyCoursesPage() {
                 if (!newArray.has(currentKey)) {
                     newArray.set(currentKey, []);
                 }
-                newArray.get(currentKey)?.push(copiedArray.at(0)!);
-                copiedArray.splice(0, 1);
+                newArray.get(currentKey)?.push(copiedArray.at(0)!); //push the current course {subj_cd, course_nbr, ...} 
+                copiedArray.splice(0, 1); //Remove the processed course from the copy array
             }
             setEasyCoursesMap(newArray);
         };
@@ -74,6 +81,12 @@ export default function EasyCoursesPage() {
                     onChange={setSelectedLevel}
                     value={selectedLevel}
                     />
+                <Select
+                    label="Minimum Year"
+                    items={yearArray}
+                    onChange={setSelectedYear}
+                    value={selectedYear}
+                />
                 <button id="easy-course-find-button" onClick={findEasyCourseHandler}>Find</button>
             </div>
             <div className="easy-courses-results-container">
@@ -83,7 +96,9 @@ export default function EasyCoursesPage() {
                         <table className="courses-table" key={`${courseKey}-${index}`}>
                                 <thead>
                                     <tr>
-                                        <th id={courseKey} className="course-subject-number-header" colSpan={2}>{courses[0].subj_cd + " " + courses[0].course_nbr}</th>
+                                        <th id={courseKey} className="course-subject-number-header" colSpan={2}>
+                                            {`${courses[0].subj_cd} ${courses[0].course_nbr}: ${courses[0].title}`}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
