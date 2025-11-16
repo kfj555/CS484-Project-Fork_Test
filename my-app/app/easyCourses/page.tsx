@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import Select from "../_components/Select";
 import "../styles/easyCourses.css";
 import type { EasyCourse } from "../types";
@@ -16,6 +16,8 @@ export default function EasyCoursesPage() {
     const [selectedLevel, setSelectedLevel] = useState<string>("all");
     //courses data map
     const [easyCoursesMap, setEasyCoursesMap] = useState<Map<string, EasyCourse[]>>(new Map());
+    //button clicked
+    const [attemptedFetch, setAttemptedFetch] = useState<boolean>(false);
 
     // On component mount, fetch the list of departments
     useEffect(() => {
@@ -55,7 +57,8 @@ export default function EasyCoursesPage() {
             }
             setEasyCoursesMap(newArray);
         };
-        fetchEasyCourses(); 
+        fetchEasyCourses();
+        setAttemptedFetch(true);
     }
 
     function getGpaColor(gpa: number): string {
@@ -65,10 +68,46 @@ export default function EasyCoursesPage() {
         return `rgb(${red}, ${green}, 0)`;
     }
 
+    function renderTable(): JSX.Element {
+        const easyCoursesArray = Array.from(easyCoursesMap.entries()); //Format [[key, value], [key, value], ...]
+        return (
+            <div className="flex flex-col">
+                {(easyCoursesMap.size > 0) && (
+                        easyCoursesArray.map(([courseKey, courses], index) => (
+                            <table className="courses-table" key={`${courseKey}-${index}`}>
+                                    <thead>
+                                        <tr>
+                                            <th id={courseKey} className="course-subject-number-header" colSpan={2}>
+                                                {`${courses[0].subj_cd} ${courses[0].course_nbr}: ${courses[0].title}`}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="courses-entries-header-row">
+                                            <th>Instructor</th>
+                                            <th>Average GPA</th>
+                                        </tr>
+                            {courses.map((course, index) => (
+                                <tr className="courses-entries-row" key={`${courseKey}-${index}`}>
+                                            <th>{course.instructor}</th>
+                                            <th style={{backgroundColor: getGpaColor(course.avg_gpa) }}>{course.avg_gpa.toFixed(2)}</th>
+                                        </tr>
+                            ))}
+                                    </tbody>
+                            </table>
+                        ))
+                    )
+                }
+                {(easyCoursesMap.size === 0 && attemptedFetch) && (
+                    <p>No easy courses found</p>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center py-10">
-            <div className="flex flex-col items-center">
+            <div id="easy-course-filters" className="flex flex-col items-center">
                 <Select
                     label="Departments"
                     items={departmentArray}
@@ -90,35 +129,7 @@ export default function EasyCoursesPage() {
                 <button id="easy-course-find-button" onClick={findEasyCourseHandler}>Find</button>
             </div>
             <div className="easy-courses-results-container">
-                <div className="flex flex-col">
-                {(easyCoursesMap.size > 0) ? (
-                    Array.from(easyCoursesMap.entries()).map(([courseKey, courses], index) => (
-                        <table className="courses-table" key={`${courseKey}-${index}`}>
-                                <thead>
-                                    <tr>
-                                        <th id={courseKey} className="course-subject-number-header" colSpan={2}>
-                                            {`${courses[0].subj_cd} ${courses[0].course_nbr}: ${courses[0].title}`}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="courses-entries-header-row">
-                                        <th>Instructor</th>
-                                        <th>Average GPA</th>
-                                    </tr>
-                        {courses.map((course, index) => (
-                            <tr className="courses-entries-row" key={`${courseKey}-${index}`}>
-                                        <th>{course.instructor}</th>
-                                        <th style={{backgroundColor: getGpaColor(course.avg_gpa) }}>{course.avg_gpa.toFixed(2)}</th>
-                                    </tr>
-                        ))}
-                                </tbody>
-                        </table>
-                    ))
-                ) : (
-                    <p>No entries</p>
-                )}
-                </div>
+                {renderTable()}
             </div>
         </div>
     );
