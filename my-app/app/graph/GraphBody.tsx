@@ -2,7 +2,7 @@
 import { ChartData, Chart as ChartJS, ChartOptions } from "chart.js/auto"; // include /auto
 import { Bar } from "react-chartjs-2";
 import { Course } from "@/app/types";
-
+import Button from "../_components/Button";
 void ChartJS; // prevents from being tree-shaken
 
 // maps season abbreviations to full names
@@ -88,6 +88,7 @@ const GraphBody = ({ data }: { data: Course[] }) => {
     <div className="flex flex-col w-200 gap-7">
       {/* Title */}
       <div>
+        <Button href="./">Back</Button>
         <h1 className="text-lg font-semibold justify-self-center">{`${data[0].subj_cd} ${data[0].course_nbr}: ${data[0].title}`}</h1>
         <h2 className="justify-self-center">{`${seasonMap[data[0].season]} ${
           data[0].year
@@ -97,7 +98,7 @@ const GraphBody = ({ data }: { data: Course[] }) => {
       {chartData.map((cData, index) => {
         const { A, B, C, D, F, grade_regs, W, S } = data[index];
         return (
-          <div key={index} className="border-1 mx-3 p-3">
+          <div key={index} className="border mx-3 p-3">
             <Bar data={cData} options={chartOptions} />
             {/* Extra Details */}
             <div className="pl-15">

@@ -1,3 +1,5 @@
+export type termOptions = "FA" | "SP" | "SU" | "";
+
 export type Course = {
   A: number;
   ADV: number;
@@ -21,7 +23,7 @@ export type Course = {
   grade_regs: number;
   id: number;
   instructor: string;
-  season: "FA" | "SP" | "SU";
+  season: termOptions;
   semester_id: number;
   subj_cd: string;
   title: string;

@@ -24,7 +24,7 @@ courseRouter.get("/", (req: Request, res: Response) => {
     )
     .all(department);
 
-  console.log(courses);
+  console.log("courses ", courses);
 
   if (!courses) {
     return res.status(400).json({ error: "DB Error" });
@@ -49,7 +49,7 @@ courseRouter.get("/exact", (req: Request, res: Response) => {
       SELECT c.*, s.season, s.year
       FROM courses c
       JOIN semesters s ON c.semester_id = s.id
-      WHERE c.dept_name = ? AND c.course_nbr = ? AND s.season = ? AND s.year = ?
+      WHERE c.subj_cd = ? AND c.course_nbr = ? AND s.season = ? AND s.year = ?
       `
     )
     .all(dept, cn, term.toString().toUpperCase(), year);

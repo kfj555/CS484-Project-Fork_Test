@@ -14,14 +14,14 @@ deptRouter.get("/", (req: Request, res: Response) => {
   const departments = db
     .prepare(
       `
-      SELECT DISTINCT dept_name 
+      SELECT DISTINCT subj_cd, dept_name 
       FROM courses 
       ORDER BY dept_name ASC
       `
     )
     .all();
 
-  console.log(departments);
+  console.log("departments", departments);
 
   if (!departments) {
     return res.status(400).json({ error: "DB Error" });

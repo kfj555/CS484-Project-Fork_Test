@@ -23,7 +23,7 @@ export default async function Graph({
     <div className="flex flex-col justify-center items-center py-10">
       {error === 0 && <GraphBody data={data} />}
       {error === 1 && (
-        <div className="border-1">
+        <div className="border">
           <p className="px-10 py-20 font-semibold text-2xl">Course not found</p>
         </div>
       )}

@@ -8,13 +8,12 @@ const db = new Database(dbPath, { readonly: true });
 
 export const statisticsRouter = express.Router();
 
-
 statisticsRouter.get("/", (req: Request, res: Response) => {
   res.json([]);
 });
 
 statisticsRouter.get("/easy", (req: Request, res: Response) => {
-  const { department, level } = req.query;
+  const { department, subj, level } = req.query;
   // Normalize and validate level to avoid producing `undefined%`.
   const stringLevel = String(level).trim();
   let dbCourseLevel: string;
@@ -33,17 +32,27 @@ statisticsRouter.get("/easy", (req: Request, res: Response) => {
       FROM courses c
       JOIN semesters s ON c.semester_id = s.id
       WHERE c.dept_name = ? AND 
+            c.subj_cd = ? AND
             c.course_nbr LIKE ?
       GROUP BY c.subj_cd,
               c.course_nbr,
               c.instructor
       HAVING avg_gpa >= 3
-      ORDER BY avg_gpa DESC
+      ORDER BY c.course_nbr ASC, avg_gpa DESC
       `
-    ).all(department, dbCourseLevel) as { subj_cd: string; course_nbr: string; instructor: string; avg_gpa: number }[];
+    )
+    .all(department, subj, dbCourseLevel) as {
+    subj_cd: string;
+    course_nbr: string;
+    instructor: string;
+    avg_gpa: number;
+  }[];
 
   if (!rows) {
     return res.status(400).json({ error: "DB Error" });
   }
+
+  console.log("easy courses", department, subj, level, rows);
+
   res.json(rows);
 });
