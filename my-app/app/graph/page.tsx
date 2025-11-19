@@ -8,10 +8,11 @@ export default async function Graph({
 }) {
   // department, term, year, and (course) number given from prev page
   const { d, t, y, n } = await searchParams;
+  const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 
-  const res =
-    await fetch(`http://localhost:3001/course/exact?dept=${d}&cn=${n}&term=${t}&year=${y}
-`);
+  const res = await fetch(
+    `${BASE}/course/exact?dept=${d}&cn=${n}&term=${t}&year=${y}`
+  );
 
   const data = await res.json();
   console.log(data);

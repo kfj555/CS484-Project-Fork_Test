@@ -10,6 +10,7 @@ export default function HomeBody({
   years = [{ year: -1 }],
   cNums = [{ course_nbr: "" }],
 }) {
+  const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
   // department, term, year, and course num used for querying
   const [department, setDepartment] = useState<string>(
     departments[0].dept_name ?? ""
@@ -30,7 +31,7 @@ export default function HomeBody({
       if (department === "") return;
 
       const availableTermsRes = await fetch(
-        `http://localhost:3001/semesters?department=${department}&year=${year}`
+        `${BASE}/semesters?department=${department}&year=${year}`
       );
       const availableSeasonsData: string[] = await availableTermsRes.json();
       setAvailableSeasons(availableSeasonsData);
@@ -47,7 +48,7 @@ export default function HomeBody({
       const seasonToUse = term ?? availableSeasons[0] ?? "FA";
 
       const availableCourseNumbersRes = await fetch(
-        `http://localhost:3001/semesters/courses?department=${department}&year=${year}&season=${seasonToUse}`
+        `${BASE}/semesters/courses?department=${department}&year=${year}&season=${seasonToUse}`
       );
       const availableCourseNumbersData: string[] =
         await availableCourseNumbersRes.json();

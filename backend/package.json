@@ -2,10 +2,12 @@
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "tsx": "^4.19.0"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node server.ts"
+    "dev": "nodemon --exec ts-node server.ts",
+    "start": "tsx server.ts"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

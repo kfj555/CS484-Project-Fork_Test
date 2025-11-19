@@ -11,6 +11,7 @@ type EasyCourse = {
 };
 
 export default function EasyCoursesPage() {
+    const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
     const courseLevels: string[] = ["all", "100", "200", "300", "400", "500"];
     const [departmentArray, setDepartmentArray] = useState<string[]>([]);
     const [selectedDepartment, setSelectedDepartment] = useState<string>("");
@@ -19,7 +20,7 @@ export default function EasyCoursesPage() {
 
     useEffect(() => {
         const fetchDepartments = async () => {
-            const res = await fetch("http://localhost:3001/department");
+            const res = await fetch(`${BASE}/department`);
             const data = await res.json();
             setDepartmentArray(data.map((dept: { dept_name: string }) => dept.dept_name));
             setSelectedDepartment(data[1]?.dept_name || "");
@@ -30,7 +31,7 @@ export default function EasyCoursesPage() {
     async function findEasyCourseHandler(): Promise<void> {
         const fetchEasyCourses = async () => {
             const easyCoursesRes = await fetch(
-                `http://localhost:3001/statistics/easy?department=${selectedDepartment}&level=${selectedLevel}`
+                `${BASE}/statistics/easy?department=${selectedDepartment}&level=${selectedLevel}`
             );
             const easyCoursesData: EasyCourse[] = await easyCoursesRes.json();
             const copiedArray: EasyCourse[] = [...easyCoursesData];

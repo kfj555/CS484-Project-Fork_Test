@@ -52,7 +52,12 @@ export default function VerifyPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || 'Invalid code');
-      router.replace(next); // on success, redirect to originally requested page
+      // Force a full navigation so middleware sees the new cookie
+      if (typeof window !== 'undefined') {
+        window.location.replace(next);
+      } else {
+        router.replace(next);
+      }
     } catch (err: any) {
       setError(err?.message || 'Verification failed');
     } finally {

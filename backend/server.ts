@@ -8,7 +8,7 @@ import { semesterRouter } from "./routes/semesters.ts";
 import { statisticsRouter } from "./routes/statistics.ts";
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 
 app.use(cors());
 
@@ -19,5 +19,5 @@ app.use("/semesters", semesterRouter);
 app.use("/statistics", statisticsRouter);
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
