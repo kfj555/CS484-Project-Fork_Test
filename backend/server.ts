@@ -1,12 +1,12 @@
 // server.js
 import express from "express";
 import cors from "cors";
-import { courseRouter } from "./routes/course.ts";
-import { deptRouter } from "./routes/department.ts";
-import { yearRouter } from "./routes/year.ts";
-import { semesterRouter } from "./routes/semesters.ts";
-import { statisticsRouter } from "./routes/statistics.ts";
-import { instructorRouter } from "./routes/instructor.ts";
+import { courseRouter } from "./routes/course.js";
+import { deptRouter } from "./routes/department.js";
+import { yearRouter } from "./routes/year.js";
+import { semesterRouter } from "./routes/semesters.js";
+import { statisticsRouter } from "./routes/statistics.js";
+import { instructorRouter } from "./routes/instructor.js";
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -20,6 +20,6 @@ app.use("/semesters", semesterRouter);
 app.use("/statistics", statisticsRouter);
 app.use("/instructor", instructorRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
