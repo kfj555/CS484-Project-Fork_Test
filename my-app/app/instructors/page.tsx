@@ -4,6 +4,7 @@ import Card from "../_components/Card";
 import SearchableSelect from "../_components/SearchableSelect";
 import Button from "../_components/Button";
 
+const BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 const Instructor = () => {
   const [instructor, setInstructor] = useState<string>("");
   const [instructors, setInstructors] = useState<{ instructor: string }[]>([]);
@@ -13,7 +14,7 @@ const Instructor = () => {
 
   useEffect(() => {
     const fetchInstructors = async () => {
-      const res = await fetch("http://localhost:3001/instructor");
+      const res = await fetch(`${BASE}/instructor`);
       const data = await res.json();
       const instructorData = data.splice(1); // remove , at start
       setInstructors(instructorData);
@@ -26,9 +27,7 @@ const Instructor = () => {
     const fetchInfo = async () => {
       if (!instructor) return;
       const res = await fetch(
-        `http://localhost:3001/instructor/info?name=${encodeURIComponent(
-          instructor
-        )}`
+        `${BASE}/instructor/info?name=${encodeURIComponent(instructor)}`
       );
       const data = await res.json();
       console.log("instructor info data", data);
