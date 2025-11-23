@@ -97,7 +97,7 @@ export default function VerifyPage() {
               id="email"
               type="email"
               required
-              placeholder="you@uic.edu"
+              placeholder="you!@uic.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{ padding: 10, border: '1px solid #000', borderRadius: 6 }}
